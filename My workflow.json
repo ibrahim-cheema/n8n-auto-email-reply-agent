@@ -1,0 +1,276 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "a4da1cd5-fba5-465a-ad57-b01cbaaa6101",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5Wf7iOw2m6X7Lr7A",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Order",
+              "description": "Emails about new orders or purchases"
+            },
+            {
+              "category": "Inquiry",
+              "description": "Customer questions or general inquiries"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "Classify the text into one of the following categories: {categories}, and only return the category name.",
+          "enableAutoFixing": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "8716e2be-7999-4e66-8dc3-e13a159fd62a",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        296,
+        128
+      ],
+      "id": "1f820a4d-8c5e-4383-be40-c239e43469e2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "N8MhftmFH70tQWEa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a smart and professional email assistant.\n\nYour task is to reply to the email below in a clear, polite, and helpful way.\n\nEmail:\n{{ $('Gmail Trigger').item.json.snippet }}\n\nGuidelines:\n- Keep it concise and professional\n- Understand the intent of the email\n- If it's a business inquiry, respond in a helpful and slightly persuasive tone\n- Do NOT use placeholders like [Name]\n\nOutput ONLY in this format:\n\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\n\nBody:\n{{ $json.snippet }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        -192
+      ],
+      "id": "fe13496b-9e01-44f2-8e52-01772005d1b6",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "N8MhftmFH70tQWEa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $('Text Classifier').item.json.Subject }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -192
+      ],
+      "id": "a73b4ca5-cc07-45fa-b625-2fef752762d4",
+      "name": "Create a draft",
+      "webhookId": "a0e84cbe-5866-4dad-bb71-2ca7fa447916",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5Wf7iOw2m6X7Lr7A",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a smart and professional email assistant.\n\nYour task is to reply to the email below in a clear, polite, and helpful way.\n\nEmail:\n{{ $('Gmail Trigger').item.json.snippet }}\n\nGuidelines:\n- Keep it concise and professional\n- Understand the intent of the email\n- If it's a business inquiry, respond in a helpful and slightly persuasive tone\n- Do NOT use placeholders like [Name]\n\nOutput ONLY in this format:\n\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\n\nBody:\n{{ $json.snippet }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "804198c5-3246-457b-9a8f-a28254584e21",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "N8MhftmFH70tQWEa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $('Gmail Trigger').item.json.Subject }}",
+        "message": "={{ $('Gmail Trigger').item.json.snippet }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        0
+      ],
+      "id": "4b869a89-1a5b-4d11-b120-d5b10bbbf3a4",
+      "name": "Create a draft1",
+      "webhookId": "f236843d-5fec-4d16-8d63-cf1afd58d5be",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5Wf7iOw2m6X7Lr7A",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Create a draft1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1d19afbc-c085-408f-93f2-38a57f350d3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ebd8eb1f2e7ab43d5d7ddecc21111172aa225364740379cc8bcba7cb4f02777"
+  },
+  "id": "1BTqleTFyjaFT6Cf",
+  "tags": []
+}
