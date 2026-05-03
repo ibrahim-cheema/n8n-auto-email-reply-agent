@@ -1,108 +1,76 @@
-📧 Gmail Auto-Responder Workflow for n8n
+Gmail-Auto-Responder-Workflow-n8n
 
-This n8n workflow automatically processes incoming Gmail emails, classifies them into categories (Order / Inquiry), and generates appropriate draft replies using OpenAI's GPT-4o-mini model.
+This project is an automated email response system built using n8n. It monitors incoming Gmail messages, classifies them into categories such as Order or Inquiry, and generates professional draft replies using the GPT-4o-mini model. The workflow helps streamline email handling while keeping human review in control.
 
-🚀 Features
-Gmail Integration
-Triggers on new incoming emails (polling every minute)
-Text Classification
-Automatically categorizes emails as:
-Order
-Inquiry
-AI-Powered Responses
-Generates professional, context-aware draft replies
-Draft Creation
-Saves AI-generated responses as drafts in Gmail for review
-📋 Prerequisites
-n8n instance (self-hosted or cloud)
-Gmail account with OAuth2 credentials
-OpenAI API key (or n8n free OpenAI credits)
-🔧 Required Credentials
-Credential Type	Name in Workflow	Purpose
-Gmail OAuth2	Gmail OAuth2 API	Access Gmail to read emails & create drafts
-OpenAI API	n8n OpenAI credentials	Generate AI-powered responses
-🔄 Workflow Overview
-Gmail Trigger → Text Classifier → (Branch based on classification)
-                                    ├─ Order → Message a model → Create draft
-                                    └─ Inquiry → Message a model1 → Create draft1
-📁 Nodes Explained
-1. Gmail Trigger
-Type: gmailTrigger
-Function: Polls Gmail every minute for new emails
-Output: Email snippet + metadata
-2. Text Classifier
-Type: textClassifier (LangChain)
-Input: Email snippet from Gmail
-Output: Category classification
+Project Focus
 
-Categories:
+The goal of this project is to demonstrate how AI and automation can be combined to handle repetitive communication tasks. It focuses on workflow automation, text classification, and AI-generated responses while maintaining a simple and scalable structure inside n8n.
 
-Order → Emails about purchases/orders
-Inquiry → Questions or general inquiries
-3. OpenAI Chat Model
-Model: gpt-4o-mini
-Purpose: Supports classification accuracy
-4. Message a Model (Order Branch)
-Model: gpt-4o-mini
-Task: Generate replies for order-related emails
-
-Output Format:
-
-Subject: [Original Subject]
-Body: [Generated response]
-5. Message a Model1 (Inquiry Branch)
-Same configuration as Order branch
-Handles inquiry-based emails
-6. Create a Draft / Create a Draft1
-Type: Gmail (Draft)
-Function: Saves AI-generated responses as drafts
-⚙️ Configuration Options
+Requirements
+Email Monitoring: Use Gmail Trigger node to detect new incoming emails.
+Text Classification: Classify emails into categories like Order and Inquiry.
+AI Response Generation: Use GPT-4o-mini to generate context-aware replies.
+Draft Creation: Save responses as Gmail drafts instead of sending automatically.
+Branching Logic: Implement conditional paths based on classification results.
+Custom Prompts: Allow modification of response tone and format.
+Scalability: Support adding more categories such as Support or Feedback.
+Workflow Overview
+Gmail Trigger → Text Classifier
+Order → AI Model → Create Draft
+Inquiry → AI Model → Create Draft
+Nodes Description
 Gmail Trigger
-
-Modify polling frequency:
-
-everyMinute (default)
-everyHour
-everyDay
-Custom intervals
+Polls Gmail every minute
+Captures email snippet and metadata
 Text Classifier
+Categorizes emails into predefined types
+Uses AI-assisted classification
+OpenAI Model
+Model: GPT-4o-mini
+Generates responses based on email content
+Message Nodes
+Create structured replies with subject and body
+Draft Nodes
+Save generated replies as Gmail drafts
+Configuration
+Gmail Setup
+Configure Gmail OAuth2 credentials
+Connect Gmail account to n8n
+OpenAI Setup
+Use API key or n8n built-in credits
+Customization
+Modify prompts inside message nodes
+Adjust tone (formal, casual, business)
+Add new classification categories
+Usage
+Import the workflow into n8n
+Configure credentials (Gmail + OpenAI)
+Activate the workflow
+New emails will be processed automatically
+Review generated drafts in Gmail before sending
+Output Format
 
-Add new categories:
+Subject: Original email subject
+Body: AI-generated professional response
 
-{
-  "category": "Support",
-  "description": "Technical support requests"
-}
-AI Response Customization
-
-Edit prompts inside "Message a model" nodes:
-
-Adjust tone (formal, casual, professional)
-Add business-specific context
-Change response format
-🚦 Workflow Status
-
-⚠️ The workflow is currently INACTIVE ("active": false)
-
-To Activate:
-Import workflow into n8n
-Configure credentials
-Enable using the "Active" toggle
-📝 Usage Notes
-Replies are saved as drafts only (not auto-sent)
-Always review before sending
-Uses branching logic based on classification
-Both branches currently use similar prompts (customize recommended)
-🛠️ Customization Ideas
-➕ Add more categories (Support, Feedback, Spam)
-🎯 Customize replies per category
-📤 Enable auto-send (replace draft node with send node)
-⚠️ Add fallback for unclassified emails
-🔔 Integrate webhook notifications for important emails
-⚠️ Limitations
-Polling-based (not real-time)
+Customization Ideas
+Add more categories (Support, Complaints, Feedback)
+Enable auto-send instead of drafts
+Add notifications for high-priority emails
+Improve classification with more detailed prompts
+Integrate with CRM or databases
+Limitations
+Uses polling instead of real-time triggers
 Requires manual review before sending
-OpenAI free credits may be limited
-📄 License
+AI responses depend on prompt quality
+Free API credits may have limits
+Installation
 
-This workflow is provided as-is for personal and commercial use.
+Make sure you have the following:
+
+n8n (self-hosted or cloud)
+Gmail account with OAuth2 setup
+OpenAI API key or n8n credits
+License
+
+This project is provided as-is for personal and commercial use.
